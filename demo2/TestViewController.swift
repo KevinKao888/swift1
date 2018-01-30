@@ -25,10 +25,11 @@ class TestViewController: UIViewController {
     }
     
     @IBAction func btnTest(_ sender: Any) {
-        print("test!!!")
-        
-        dbHelper = DBHelper.init()  //這行多餘的
-        
+        let data = dbHelper.findAll()
+        let last = data[data.count-1]
+        last.amount = 999
+        dbHelper.update(record: last)
+        dbHelper.delete(index: 6)
     }
     
     @IBAction func btnInsert(_ sender: Any) {
@@ -46,9 +47,9 @@ class TestViewController: UIViewController {
         //print(arr.count)  //show count for check
         
         //full scan data by for loop
-        for i  in 1...arr.count-1{
+        for i  in 0...arr.count-1{
             print(arr[i].id);
-            print(arr[i].description);
+            print(arr[i].amount);
         }
     }
     

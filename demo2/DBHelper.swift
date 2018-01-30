@@ -51,10 +51,16 @@ class DBHelper{
     //建立資料表
     func createTable(){
         do{
+            let cmd1 = records.drop()
+            print(cmd1.asSQL())
+            try db!.run(cmd1)
+            
             //組合SQL語法
             let cmd  = records.create(ifNotExists:true){
                 t in
-                t.column(id, primaryKey: true)
+                t.col
+                t.column(id, primaryKey: .autoincrement)
+                //t.column(id, primaryKey: true)
                 t.column(trade_type)
                 t.column(trade_date)
                 t.column(amount)
@@ -111,6 +117,56 @@ class DBHelper{
             print("Error : \(error)")
         }
         return result
+    }
+    
+    //查詢指定ID資料
+    func find(index:Int64)->Record{
+        var result : Record?
+        do{
+            let cmd = records.filter(id == index)
+            if let item = try db!.pluck(cmd){
+                result =  Record(id: item[id],
+                                 trade_type: item[trade_type],
+                                 trade_date :item[trade_date],
+                                 amount:item[amount],
+                                 description:item[description]!,
+                                 photo_path:item[photo_path]!)
+            }
+        }catch{
+            print("Error : \(error)")
+        }
+        return result!
+    }
+    
+    //更新
+    func update(record:Record){
+        do{
+            let temp = records.filter(id == record.id)
+            let cmd = temp.update( trade_type<-record.trade_type,
+                                   trade_date<-record.trade_date,
+                                   amount<-record.amount,
+                                   description<-record.description,
+                                   photo_path<-record.photo_path)
+            
+            print(cmd.asSQL())
+            try db!.run(cmd)
+            
+        }catch{
+            print("Error : \(error)")
+        }
+    }
+    
+    //刪除
+    func delete(index:Int64!){
+        do{
+            let qry = "DELETE FROM records WHERE id=" + String(index)
+            try db!.run(qry)
+            //let cmd = records.filter(id == index)
+            //let result = cmd.delete()
+            //print("Result : \(result)");
+        }catch{
+            print("Error : \(error)")
+        }
     }
     
 }
